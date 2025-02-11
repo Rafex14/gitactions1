@@ -13,6 +13,7 @@ jobs:
           run: ls -la .github/workflows
 
         - name: Executing shell script
-          run: |
-            sudo chmod +x ascii-script.sh  
-            ./ascii-script.sh  
+          run: chmod +x ascii-script.sh  
+          
+        - name: List files
+          run: ls -la .github/workflows
