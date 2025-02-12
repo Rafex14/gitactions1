@@ -1,0 +1,48 @@
+name: Running Multiple Jobs in Sequence 
+
+on: push
+
+jobs: 
+    build_job1:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Install Cowsay Program
+          run: sudo apt-get install cowsay -y 
+        
+        - name: Execute Cowsay CMD
+          run: cowsay -f dragon "Run for cover, I'm a DRAGON....RAWR" >> dragon.txt
+        
+        - name: Upload Dragon text file #need to use another action to upload the file to an artifactory
+          uses: actions/upload-artifact@v3
+          with:
+            name: dragon-text-file
+            path: dragon.txt 
+    
+    test_job2:
+        needs: build_job1
+        runs-on: ubuntu-latest
+        steps:
+        - name: Download Dragon text file #need to use another action to Download the file from the artifactory
+          uses: actions/download-artifact@v3
+          with:
+            name: dragon-text-file
+
+        - name: Test File exist
+          run: grep -i "dragon" dragon.txt
+
+    deploy_job3:
+        needs: test_job2 # I can use [build_job1,test_job2] to select multiple jobs and then execute this job
+        runs-on: ubuntu-latest
+        steps:
+        - name: Download Dragon text file #need to use another action to Download the file from the artifactory
+          uses: actions/download-artifact@v3
+          with:
+            name: dragon-text-file
+
+        - name: Read File
+          run: cat dragon.txt
+
+        - name: Deploy
+          run: echo Deploying ... .. .
+
+    
