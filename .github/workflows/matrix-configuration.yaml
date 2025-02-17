@@ -1,0 +1,27 @@
+name: Matrix Configuration
+
+on: push
+
+jobs:
+    deploy_and_build:
+      strategy:
+#        fail-fast: false --by default is set to true is going to cancel a job when the previous fail
+#        max-parallel: 3 --this will only allow to run 3 jobs in parallel
+        matrix:
+          os: [ubuntu-latest, ubuntu-20.04, windows-latest]
+          images: [hello-world, alpine]
+          exclude: # as windows cannot run the alpine image, here we are excluding then to do it
+            - images: alpine
+              os: windows-latest
+          include:
+            - images: adm/alpine
+              os: ubuntu-20.04
+
+      runs-on: ${{matrix.os}}
+
+      steps:
+      - name: Echo Docker details
+        run: docker info
+    
+      - name: Run Images on ${{matrix.os}}
+        run: docker run ${{matrix.images}}
